@@ -152,7 +152,7 @@ $sg-border-radius-med : 6px;
 #patternlab-html, #patternlab-body {
     margin: 0;
     padding: 0;
-    background: $sg-gray-light-2;
+    background: #f9f9fb;
     -webkit-text-size-adjust: 100%;
 }
 
@@ -170,7 +170,8 @@ $sg-border-radius-med : 6px;
 * and tools.
 */
 .sg-header {
-    background: $sg-black;
+    background: #1f2532;
+    box-shadow: 0 2px 9px rgba(31,37,50,.15);
     color: $sg-white;
     font-family: $sg-font;
     text-transform: uppercase;
@@ -179,6 +180,7 @@ $sg-border-radius-med : 6px;
     left: 0;
     z-index: 4;
     width: 100%;
+    transform: translate3d(0,0,0);
 
     /**
     * All lists appearing in the header
@@ -194,7 +196,7 @@ $sg-border-radius-med : 6px;
     */
     a {
         font-size: $sg-font-size-sm;
-        color: $sg-gray;
+        color: #99a0af;
         text-decoration: none;
         line-height: 1;
         padding: 1em 0.7em;
@@ -748,15 +750,19 @@ $sg-border-radius-med : 6px;
 * Viewport wrapper div
 * 1) This wrapper div occupies all remaining viewport space after PL's header
 */
-#sg-vp-wrap {
-    text-align: center;
-    width: 100%;
-    position: fixed;
-    top: $offset-top;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 0;
+.sg-viewport-wrapper {
+  text-align: center;
+  width: 100%;
+  position: fixed;
+  top: $offset-top;
+  transition: height .15s linear;
+  height: 100%;
+  height: 100vh;
+  height: calc(100vh - #{$offset-top});
+  left: 0;
+  right: 0;
+  z-index: 0;
+  transform: translate3d(0,0,0);
 }
 
 /**
@@ -838,16 +844,16 @@ $sg-border-radius-med : 6px;
     margin: 0;
     width: 100%;
     height: 100%;
-    background: #c2c2c2;
+    background-color: hsla(0, 0, 76%, .5);
     transition: background $sg-animate-quick ease-out;
 
     &:hover {
-        background: $sg-gray;
+      background-color: hsla(0, 0, 76%, .7);
     }
 
     &:active {
         cursor: col-resize;
-        background: #666;
+        background: hsla(0, 0, 76%, .9);
     }
 }
 
@@ -1025,8 +1031,8 @@ $sg-border-radius-med : 6px;
 .sg-pattern-extra-info {
     padding: 0.5rem 0.5rem 0;
     line-height: 1.4;
-    font-size: 90%;
-    color: $sg-gray;
+    font-size: 95%;
+    color: white;
     overflow: auto; //allows scrolling on modals with extra long descriptions
     -webkit-overflow-scrolling: touch;
 
@@ -1172,21 +1178,20 @@ $sg-border-radius-med : 6px;
 
     a {
         display: block;
-        font-size: 90%;
+        font-size: 14px;
         font-weight: bold;
         line-height: 1;
-        padding: 0.5em 1em;
-        background: $sg-gray-light;
-        border: 1px solid $sg-gray-light-3;
-        border-bottom: 0;
+        padding: 0.8em 1em;
+        background: transparent;
+        border-bottom: 3px solid transparent;
         color: $sg-gray;
-        border-top-right-radius: $sg-border-radius-med;
-        border-top-left-radius: $sg-border-radius-med;
+        // border-top-right-radius: $sg-border-radius-med;
+        // border-top-left-radius: $sg-border-radius-med;
         text-decoration: none;
-        text-transform: capitalize;
+        text-transform: uppercase;
 
         &:hover {
-            color: $sg-gray-dark;
+          color: rgba(#61d079, .5);
         }
     }
 }
@@ -1198,11 +1203,13 @@ $sg-border-radius-med : 6px;
 */
 .sg-tab-title-active {
     a {
-        background: #f5f2f0; /* 1 */
-        color: $sg-gray-dark;
+        background: #272822; /* 1 */
+        background-color: rgba(37,44,58,.985);
+        color: #61d079;
+        border-bottom-color: #61d079;
 
         &:hover, &:focus {
-            color: $sg-gray-dark;
+            color: #61d079;
         }
     }
 }
@@ -1242,11 +1249,12 @@ $sg-border-radius-med : 6px;
 */
 
 .sg-modal {
-    font-family: $sg-font;
+    box-shadow: 0 -2px 9px rgba(31,37,50,.15);
+    font-family: "Open Sans",open-sans,sans-serif;
     line-height: 1.4;
     font-size: 90%;
-    background: $sg-black;
-    color: $sg-gray-light-3;
+    background: #1f2532;
+    color: #99a0af;
     position: fixed;
     top: auto;
     bottom: 0;
@@ -1254,18 +1262,37 @@ $sg-border-radius-med : 6px;
     z-index: 2;
     width: 100%;
     height: 50%;
+    height: 50vh;
     display: flex;
     flex-direction: column;
+    transform: translateY(100%);
+    transform: translate3d(0,100%,0);
+    transition: transform 0.3s ease-out;
 
-    &.anim-ready {
-        transition:  bottom 0.3s ease-out;
+    // &.anim-ready {
+    //   
+    // }
+    
+    &.is-open {
+      transform: translateY(0);
+      transform: translate3d(0,0,0);
+      
+      
+      & + .sg-viewport-wrapper {
+        height: 50%;
+        height: 50vh;
+        height: calc(50vh - #{$offset-top});
+      }
+      
     }
+    
+    
 
     /**
     * Pattern Breadcrumbs inside modal
     */
     .sg-pattern-breadcrumb {
-        font-size: $sg-font-size-sm;
+        font-size: 13px;
         color: $sg-gray;
         margin-bottom: 0.5rem;
     }
@@ -1338,32 +1365,57 @@ $sg-border-radius-med : 6px;
 * 1) Closes the modal popup
 * 2) Reposition to jut out of modal if parent modal has class of active
 */
-.sg-modal-close-btn {
-    font-size: 70%;
-    background: $sg-black;
-    color: $sg-gray;
-    border: 0;
-    border-radius: $sg-border-radius-med $sg-border-radius-med 0 0;
-    display: inline-block;
-    padding: 0.9em 0.7em 0.1em;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    position: absolute;
-    right: 0;
-    top: 1rem;
-    transition: all $sg-animate-quick ease-out;
-
-    /* 2 */
-    .sg-modal.active & {
-        top: -1.5rem;
-    }
-
-    &:hover, &:focus {
-        background: $sg-gray-dark;
-        color: $sg-gray-light;
-    }
+.sg-modal-button {
+  font-size: 70%;
+  background: $sg-black;
+  color: $sg-gray;
+  border: 0;
+  border-radius: $sg-border-radius-med $sg-border-radius-med 0 0;
+  display: inline-block;
+  padding: 8px;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translateY(-100%);
+  transition: all $sg-animate-quick ease-out;
+  
+  &:hover, &:focus {
+    background: $sg-gray-dark;
+    color: $sg-gray-light;
+  }
 }
+
+
+.sg-modal-button__text--show {
+  visibility: visible;
+  opacity: 1;
+  
+  
+  
+  .is-open & {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+.sg-modal-button__text--hide {
+  visibility: hidden;
+  opacity: 0;
+  
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  
+  .is-open & {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
 
 /**
 * Modal Content
@@ -1504,4 +1556,10 @@ $sg-border-radius-med : 6px;
     h2 {
         margin-bottom: 0.25em;
     }
+}
+
+
+
+code[class*=language-][class*=language-][class*=language-], pre[class*=language-][class*=language-][class*=language-] {
+  white-space: pre-wrap;
 }

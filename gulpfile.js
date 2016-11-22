@@ -53,7 +53,7 @@ gulp.task('build:bower', ['clean:bower'], function(){
 });
 
 gulp.task('build:css-general', ['clean:css-patternlab'], function() {
-	return gulp.src(['src/css/prism-okaidia.css','src/css/typeahead.css'])
+	return gulp.src(['src/css/prism.css','src/css/typeahead.css'])
 		.pipe(plugins.concat('prism-typeahead.css'))
 		.pipe(gulp.dest('dist/styleguide/css'))
 		.pipe(plugins.rename({suffix: '.min'}))
@@ -128,7 +128,7 @@ gulp.task('build:js-pattern', ['build:js-viewer'], function() {
 gulp.task('default', ['build:bower', 'build:css-patternlab', 'build:html', 'build:js-pattern'], function () {
 	if (args.watch !== undefined) {
 		gulp.watch(['src/bower_components/**/*'], ['build:bower']);
-		gulp.watch(['src/css/prism-okaidia.css'],['build:css-general']);
+		gulp.watch(['src/sass/prism.css'],['build:css-general']);
 		gulp.watch(['src/sass/styleguide.scss'], ['build:css-patternlab']);
 		gulp.watch(['src/html/*'], ['build:html']);
 		gulp.watch(['src/js/*'], ['build:js-pattern']);

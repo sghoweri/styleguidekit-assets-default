@@ -44,6 +44,27 @@ var panelsViewer = {
   * @param  {Boolean}     if this is going to be passed back to the styleguide
   */
   gatherPanels: function(patternData, iframePassback, switchText) {
+    
+    
+    if (patternData.dependencies){
+      patternData.dependencies.forEach(function(dependency) {
+          
+          Panels.add({ 
+            'id': 'sg-panel-' + dependency.id, 
+            'name': dependency.name,
+            'default': false, 
+            'templateID': 'pl-panel-template-code', 
+            'httpRequest': true, 
+            'httpRequestReplace': dependency.src, 
+            'httpRequestCompleted': false,
+            'prismHighlight': true, 
+            'fileBase': dependency.fileBase,
+            'language': dependency.language
+            // 'keyCombo': 'ctrl+shift+c'
+          });
+      });
+    }
+    
 
     Dispatcher.addListener('checkPanels', panelsViewer.checkPanels);
 
@@ -52,11 +73,18 @@ var panelsViewer = {
 
     // get the base panels
     var panels = Panels.get();
+    
+    
+    console.log(panels);
+    
 
     // evaluate panels array and create content
     for (var i = 0; i < panels.length; ++i) {
 
-      panel = panels[i];
+      var panel = panels[i];
+      
+      
+      
       
       // catch pattern panel since it doesn't have a name defined by default
       if (panel.name === undefined) {
@@ -64,24 +92,66 @@ var panelsViewer = {
         panel.httpRequestReplace = panel.httpRequestReplace+'.'+patternData.patternExtension;
         panel.language = patternData.patternExtension;
       }
-
+      
       if ((panel.templateID !== undefined) && (panel.templateID)) {
 
         if ((panel.httpRequest !== undefined) && (panel.httpRequest)) {
 
           // need a file and then render
-          var fileBase = urlHandler.getFileName(patternData.patternPartial, false);
+          var fileBase = "";
+          
+          if (panel.fileBase){
+            fileBase = panel.fileBase;
+          } else {
+            fileBase = urlHandler.getFileName(patternData.patternPartial, false);
+          }
+          
+          
           var e        = new XMLHttpRequest();
           e.onload     = (function(i, panels, patternData, iframeRequest) {
             return function() {
-              prismedContent    = Prism.highlight(this.responseText, Prism.languages['html']);
+              
+              
+              var panel = panels[i];
+              
+              if (!panel.language){
+                panel.language = 'html';
+              }
+              
+              
+              
+              // Prism.plugins.NormalizeWhitespace.setDefaults({
+              // 	'remove-trailing': true,
+              // 	'remove-indent': true,
+              // 	'left-trim': true,
+              // 	'right-trim': true,
+              //   'remove-initial-line-feed': true,
+              //   'tabs-to-spaces': 2,
+              //   'indent': 2
+              // 	/*'break-lines': 80,
+              // 	
+              // 	
+              // 	
+              // 	'spaces-to-tabs': 4*/
+              // });
+              
+              // console.log(i);
+              // 
+              // console.log(panels);
+              
+              
+              
+              prismedContent    = Prism.highlight(this.responseText, Prism.languages[panel.language]);
               template          = document.getElementById(panels[i].templateID);
               templateCompiled  = Hogan.compile(template.innerHTML);
-              templateRendered  = templateCompiled.render({ 'language': 'html', 'code': prismedContent });
+              templateRendered  = templateCompiled.render({ 'language': panel.language, 'code': prismedContent });
               panels[i].content = templateRendered;
               Dispatcher.trigger('checkPanels', [panels, patternData, iframePassback, switchText]);
             };
           })(i, panels, patternData, iframePassback);
+          
+          
+          
           
           e.open('GET', fileBase+panel.httpRequestReplace+'?'+(new Date()).getTime(), true);
           e.send();

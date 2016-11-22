@@ -90,7 +90,7 @@
 #patternlab-html, #patternlab-body {
   margin: 0;
   padding: 0;
-  background: #ddd;
+  background: #f9f9fb;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -103,7 +103,9 @@
 * and tools.
 */
 .sg-header {
-  background: #000;
+  background: #1f2532;
+  -webkit-box-shadow: 0 2px 9px rgba(31, 37, 50, 0.15);
+          box-shadow: 0 2px 9px rgba(31, 37, 50, 0.15);
   color: #fff;
   font-family: "HelveticaNeue", "Helvetica", "Arial", sans-serif;
   text-transform: uppercase;
@@ -112,6 +114,8 @@
   left: 0;
   z-index: 4;
   width: 100%;
+  -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
   /**
   * All lists appearing in the header
   */
@@ -126,7 +130,7 @@
 }
 .sg-header a {
   font-size: 70%;
-  color: #808080;
+  color: #99a0af;
   text-decoration: none;
   line-height: 1;
   padding: 1em 0.7em;
@@ -620,15 +624,21 @@
 * Viewport wrapper div
 * 1) This wrapper div occupies all remaining viewport space after PL's header
 */
-#sg-vp-wrap {
+.sg-viewport-wrapper {
   text-align: center;
   width: 100%;
   position: fixed;
   top: 2em;
-  bottom: 0;
+  -webkit-transition: height .15s linear;
+          transition: height .15s linear;
+  height: 100%;
+  height: 100vh;
+  height: calc(100vh - 2em);
   left: 0;
   right: 0;
   z-index: 0;
+  -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
 }
 
 /**
@@ -710,16 +720,16 @@
   margin: 0;
   width: 100%;
   height: 100%;
-  background: #c2c2c2;
+  background-color: rgba(194, 194, 194, 0.5);
   -webkit-transition: background 0.1s ease-out;
           transition: background 0.1s ease-out;
 }
 #sg-rightpull:hover {
-  background: #808080;
+  background-color: rgba(194, 194, 194, 0.7);
 }
 #sg-rightpull:active {
   cursor: col-resize;
-  background: #666;
+  background: rgba(194, 194, 194, 0.9);
 }
 
 /**
@@ -888,8 +898,8 @@
 .sg-pattern-extra-info {
   padding: 0.5rem 0.5rem 0;
   line-height: 1.4;
-  font-size: 90%;
-  color: #808080;
+  font-size: 95%;
+  color: white;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1044,21 +1054,18 @@
 }
 .sg-tabs-list a {
   display: block;
-  font-size: 90%;
+  font-size: 14px;
   font-weight: bold;
   line-height: 1;
-  padding: 0.5em 1em;
-  background: #eee;
-  border: 1px solid #ccc;
-  border-bottom: 0;
+  padding: 0.8em 1em;
+  background: transparent;
+  border-bottom: 3px solid transparent;
   color: #808080;
-  border-top-right-radius: 6px;
-  border-top-left-radius: 6px;
   text-decoration: none;
-  text-transform: capitalize;
+  text-transform: uppercase;
 }
 .sg-tabs-list a:hover {
-  color: #222;
+  color: rgba(97, 208, 121, 0.5);
 }
 
 /**
@@ -1067,12 +1074,14 @@
 * background color.
 */
 .sg-tab-title-active a {
-  background: #f5f2f0;
+  background: #272822;
   /* 1 */
-  color: #222;
+  background-color: rgba(37, 44, 58, 0.985);
+  color: #61d079;
+  border-bottom-color: #61d079;
 }
 .sg-tab-title-active a:hover, .sg-tab-title-active a:focus {
-  color: #222;
+  color: #61d079;
 }
 
 .sg-tabs-content {
@@ -1120,11 +1129,13 @@
 * on the pattern detail screen.
 */
 .sg-modal {
-  font-family: "HelveticaNeue", "Helvetica", "Arial", sans-serif;
+  -webkit-box-shadow: 0 -2px 9px rgba(31, 37, 50, 0.15);
+          box-shadow: 0 -2px 9px rgba(31, 37, 50, 0.15);
+  font-family: "Open Sans",open-sans,sans-serif;
   line-height: 1.4;
   font-size: 90%;
-  background: #000;
-  color: #ccc;
+  background: #1f2532;
+  color: #99a0af;
   position: fixed;
   top: auto;
   bottom: 0;
@@ -1132,6 +1143,7 @@
   z-index: 2;
   width: 100%;
   height: 50%;
+  height: 50vh;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1139,6 +1151,13 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  -webkit-transform: translateY(100%);
+      -ms-transform: translateY(100%);
+          transform: translateY(100%);
+  -webkit-transform: translate3d(0, 100%, 0);
+          transform: translate3d(0, 100%, 0);
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+          transition: transform 0.3s ease-out;
   /**
   * Pattern Breadcrumbs inside modal
   */
@@ -1164,12 +1183,20 @@
   * Pattern tab panel inside modal
   */
 }
-.sg-modal.anim-ready {
-  -webkit-transition: bottom 0.3s ease-out;
-          transition: bottom 0.3s ease-out;
+.sg-modal.is-open {
+  -webkit-transform: translateY(0);
+      -ms-transform: translateY(0);
+          transform: translateY(0);
+  -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
+}
+.sg-modal.is-open + .sg-viewport-wrapper {
+  height: 50%;
+  height: 50vh;
+  height: calc(50vh - 2em);
 }
 .sg-modal .sg-pattern-breadcrumb {
-  font-size: 70%;
+  font-size: 13px;
   color: #808080;
   margin-bottom: 0.5rem;
 }
@@ -1211,30 +1238,52 @@
 * 1) Closes the modal popup
 * 2) Reposition to jut out of modal if parent modal has class of active
 */
-.sg-modal-close-btn {
+.sg-modal-button {
   font-size: 70%;
   background: #000;
   color: #808080;
   border: 0;
   border-radius: 6px 6px 0 0;
   display: inline-block;
-  padding: 0.9em 0.7em 0.1em;
+  padding: 8px;
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
   position: absolute;
   right: 0;
-  top: 1rem;
+  top: 0;
+  -webkit-transform: translateY(-100%);
+      -ms-transform: translateY(-100%);
+          transform: translateY(-100%);
   -webkit-transition: all 0.1s ease-out;
           transition: all 0.1s ease-out;
-  /* 2 */
 }
-.sg-modal.active .sg-modal-close-btn {
-  top: -1.5rem;
-}
-.sg-modal-close-btn:hover, .sg-modal-close-btn:focus {
+.sg-modal-button:hover, .sg-modal-button:focus {
   background: #222;
   color: #eee;
+}
+
+.sg-modal-button__text--show {
+  visibility: visible;
+  opacity: 1;
+}
+.is-open .sg-modal-button__text--show {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.sg-modal-button__text--hide {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate3d(-50%, -50%, 0);
+          transform: translate3d(-50%, -50%, 0);
+}
+.is-open .sg-modal-button__text--hide {
+  visibility: visible;
+  opacity: 1;
 }
 
 /**
@@ -1390,4 +1439,8 @@
 }
 .sg-comment-container h2 {
   margin-bottom: 0.25em;
+}
+
+code[class*=language-][class*=language-][class*=language-], pre[class*=language-][class*=language-][class*=language-] {
+  white-space: pre-wrap;
 }

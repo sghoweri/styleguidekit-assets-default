@@ -24,15 +24,16 @@ var modalViewer = {
   */
   onReady: function() {
     
+    
     // make sure the listener for checkpanels is set-up
     Dispatcher.addListener('insertPanels', modalViewer.insert);
     
-    // watch for resizes and hide the modal container as appropriate when the modal is already hidden
-    $(window).on('resize', function() {
-      if (DataSaver.findValue('modalActive') === 'false') {
-        modalViewer.slide($('#sg-modal-container').outerHeight());
-      }
-    });
+    // // watch for resizes and hide the modal container as appropriate when the modal is already hidden
+    // $(window).on('resize', function() {
+    //   if (DataSaver.findValue('modalActive') === 'false') {
+    //     modalViewer.slide($('#sg-modal-container').outerHeight());
+    //   }
+    // });
     
     // add the info/code panel onclick handler
     $('#sg-t-patterninfo').click(function(e) {
@@ -43,17 +44,11 @@ var modalViewer = {
     });
     
     // make sure the close button handles the click
-    $('#sg-modal-close-btn').on('click', function(e) {
+    $('.js-modal-toggle-button').on('click', function(e) {
       
       e.preventDefault();
       
-      // hide any open annotations
-      obj = JSON.stringify({ 'event': 'patternLab.annotationsHighlightHide' });
-      document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
-      
-      // hide the viewer
-      modalViewer.close();
-      
+      modalViewer.toggle();
     });
     
     // see if the modal is already active, if so update attributes as appropriate
@@ -63,7 +58,7 @@ var modalViewer = {
     }
     
     // make sure the modal viewer is not viewable, it's alway hidden by default. the pageLoad event determines when it actually opens
-    modalViewer.hide();
+    // modalViewer.hide();
     
     // review the query strings in case there is something the modal viewer is supposed to handle by default
     var queryStringVars = urlHandler.getRequestVars();
@@ -86,6 +81,8 @@ var modalViewer = {
   toggle: function() {
     if (modalViewer.active === false) {
       modalViewer.queryPattern();
+      modalViewer.open();
+      
     } else {
       obj = JSON.stringify({ 'event': 'patternLab.annotationsHighlightHide' });
       document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
@@ -98,8 +95,9 @@ var modalViewer = {
   */
   open: function() {
     
-    // make sure the modal viewer and other options are off just in case
-    modalViewer.close();
+    // // make sure the modal viewer and other options are off just in case
+    // modalViewer.close();
+    $('#sg-modal-container').addClass('is-open');
 
     // note it's turned on in the viewer
     DataSaver.updateValue('modalActive', 'true');
@@ -108,11 +106,10 @@ var modalViewer = {
     // add an active class to the button that matches this template
     $('#sg-t-'+modalViewer.template+' .sg-checkbox').addClass('active');
 
-    //Add active class to modal
-    $('#sg-modal-container').addClass('active');
+    
     
     // show the modal
-    modalViewer.show();
+    // modalViewer.show();
     
   },
   
@@ -123,18 +120,19 @@ var modalViewer = {
     
     var obj;
     
+    
     // not that the modal viewer is no longer active
     DataSaver.updateValue('modalActive', 'false');
     modalViewer.active = false;
     
     //Add active class to modal
-    $('#sg-modal-container').removeClass('active');
+    $('#sg-modal-container').removeClass('is-open');
     
     // remove the active class from all of the checkbox items
     $('.sg-checkbox').removeClass('active');
     
     // hide the modal
-    modalViewer.hide();
+    // modalViewer.hide();
     
     // update the wording
     $('#sg-t-patterninfo').html("Show Pattern Info");
@@ -143,14 +141,19 @@ var modalViewer = {
     obj = JSON.stringify({ 'event': 'patternLab.patternModalClose' });
     document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
     
+    // hide any open annotations
+    obj = JSON.stringify({ 'event': 'patternLab.annotationsHighlightHide' });
+    document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
+    
   },
   
-  /**
-  * hide the modal window, add 30px to account for the X box
-  */
-  hide: function() {
-    modalViewer.slide($('#sg-modal-container').outerHeight()+30);
-  },
+  // /**
+  // * hide the modal window, add 30px to account for the X box
+  // */
+  // hide: function() {
+  //   0
+  //   // modalViewer.slide($('#sg-modal-container').outerHeight()+30);
+  // },
   
   /**
   * insert the copy for the modal window. if it's meant to be sent back to the iframe do do
@@ -160,6 +163,9 @@ var modalViewer = {
   * @param  {Boolean}      if the text in the dropdown should be switched
   */
   insert: function(templateRendered, patternPartial, iframePassback, switchText) {
+    
+    console.log("insert");
+    
     
     if (iframePassback) {
       
@@ -192,7 +198,7 @@ var modalViewer = {
     
     // if this is a styleguide view close the modal
     if (iframePassback) {
-      modalViewer.hide();
+      modalViewer.close();
     }
     
     // gather the data that will fill the modal window
@@ -204,10 +210,10 @@ var modalViewer = {
   * slides the modal window into or out of view
   * @param  {Integer}      where the modal window should be slide to
   */
-  slide: function(pos) {
-    pos = (pos === 0) ? 0 : -pos;
-    $('#sg-modal-container').css('bottom',pos);
-  },
+  // slide: function(pos) {
+  //   pos = (pos === 0) ? 0 : -pos;
+  //   $('#sg-modal-container').css('bottom',pos);
+  // },
   
   /**
   * slides the modal window to a particular annotation
@@ -231,12 +237,7 @@ var modalViewer = {
     
   },
   
-  /**
-  * alias for slide
-  */
-  show: function() {
-    modalViewer.slide(0);
-  },
+
   
   /**
   * ask the pattern for info so we can open the modal window and populate it
@@ -249,6 +250,8 @@ var modalViewer = {
       switchText = true;
       DataSaver.updateValue('modalActive', 'true');
       modalViewer.active = true;
+      
+      modalViewer.open();
     }
     
     // send a message to the pattern

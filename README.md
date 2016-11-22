@@ -37,6 +37,6 @@ To make changes **always edit files in `src/`**. To make sure that these changes
 
 To watch for changes you can use:
 
-    gulp --watch --copy-dist=../../../public
+    gulp --watch --copy-dist=~/sites/pds/pegakit/public
 
 At this point changes to the static assets should compile to the correct locations in the project as well as `dist/`.

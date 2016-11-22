@@ -415,15 +415,16 @@ var modalViewer = {
   */
   onReady: function() {
     
+    
     // make sure the listener for checkpanels is set-up
     Dispatcher.addListener('insertPanels', modalViewer.insert);
     
-    // watch for resizes and hide the modal container as appropriate when the modal is already hidden
-    $(window).on('resize', function() {
-      if (DataSaver.findValue('modalActive') === 'false') {
-        modalViewer.slide($('#sg-modal-container').outerHeight());
-      }
-    });
+    // // watch for resizes and hide the modal container as appropriate when the modal is already hidden
+    // $(window).on('resize', function() {
+    //   if (DataSaver.findValue('modalActive') === 'false') {
+    //     modalViewer.slide($('#sg-modal-container').outerHeight());
+    //   }
+    // });
     
     // add the info/code panel onclick handler
     $('#sg-t-patterninfo').click(function(e) {
@@ -434,17 +435,11 @@ var modalViewer = {
     });
     
     // make sure the close button handles the click
-    $('#sg-modal-close-btn').on('click', function(e) {
+    $('.js-modal-toggle-button').on('click', function(e) {
       
       e.preventDefault();
       
-      // hide any open annotations
-      obj = JSON.stringify({ 'event': 'patternLab.annotationsHighlightHide' });
-      document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
-      
-      // hide the viewer
-      modalViewer.close();
-      
+      modalViewer.toggle();
     });
     
     // see if the modal is already active, if so update attributes as appropriate
@@ -454,7 +449,7 @@ var modalViewer = {
     }
     
     // make sure the modal viewer is not viewable, it's alway hidden by default. the pageLoad event determines when it actually opens
-    modalViewer.hide();
+    // modalViewer.hide();
     
     // review the query strings in case there is something the modal viewer is supposed to handle by default
     var queryStringVars = urlHandler.getRequestVars();
@@ -477,6 +472,8 @@ var modalViewer = {
   toggle: function() {
     if (modalViewer.active === false) {
       modalViewer.queryPattern();
+      modalViewer.open();
+      
     } else {
       obj = JSON.stringify({ 'event': 'patternLab.annotationsHighlightHide' });
       document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
@@ -489,8 +486,9 @@ var modalViewer = {
   */
   open: function() {
     
-    // make sure the modal viewer and other options are off just in case
-    modalViewer.close();
+    // // make sure the modal viewer and other options are off just in case
+    // modalViewer.close();
+    $('#sg-modal-container').addClass('is-open');
 
     // note it's turned on in the viewer
     DataSaver.updateValue('modalActive', 'true');
@@ -499,11 +497,10 @@ var modalViewer = {
     // add an active class to the button that matches this template
     $('#sg-t-'+modalViewer.template+' .sg-checkbox').addClass('active');
 
-    //Add active class to modal
-    $('#sg-modal-container').addClass('active');
+    
     
     // show the modal
-    modalViewer.show();
+    // modalViewer.show();
     
   },
   
@@ -514,18 +511,19 @@ var modalViewer = {
     
     var obj;
     
+    
     // not that the modal viewer is no longer active
     DataSaver.updateValue('modalActive', 'false');
     modalViewer.active = false;
     
     //Add active class to modal
-    $('#sg-modal-container').removeClass('active');
+    $('#sg-modal-container').removeClass('is-open');
     
     // remove the active class from all of the checkbox items
     $('.sg-checkbox').removeClass('active');
     
     // hide the modal
-    modalViewer.hide();
+    // modalViewer.hide();
     
     // update the wording
     $('#sg-t-patterninfo').html("Show Pattern Info");
@@ -534,14 +532,19 @@ var modalViewer = {
     obj = JSON.stringify({ 'event': 'patternLab.patternModalClose' });
     document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
     
+    // hide any open annotations
+    obj = JSON.stringify({ 'event': 'patternLab.annotationsHighlightHide' });
+    document.getElementById('sg-viewport').contentWindow.postMessage(obj, modalViewer.targetOrigin);
+    
   },
   
-  /**
-  * hide the modal window, add 30px to account for the X box
-  */
-  hide: function() {
-    modalViewer.slide($('#sg-modal-container').outerHeight()+30);
-  },
+  // /**
+  // * hide the modal window, add 30px to account for the X box
+  // */
+  // hide: function() {
+  //   0
+  //   // modalViewer.slide($('#sg-modal-container').outerHeight()+30);
+  // },
   
   /**
   * insert the copy for the modal window. if it's meant to be sent back to the iframe do do
@@ -551,6 +554,9 @@ var modalViewer = {
   * @param  {Boolean}      if the text in the dropdown should be switched
   */
   insert: function(templateRendered, patternPartial, iframePassback, switchText) {
+    
+    console.log("insert");
+    
     
     if (iframePassback) {
       
@@ -583,7 +589,7 @@ var modalViewer = {
     
     // if this is a styleguide view close the modal
     if (iframePassback) {
-      modalViewer.hide();
+      modalViewer.close();
     }
     
     // gather the data that will fill the modal window
@@ -595,10 +601,10 @@ var modalViewer = {
   * slides the modal window into or out of view
   * @param  {Integer}      where the modal window should be slide to
   */
-  slide: function(pos) {
-    pos = (pos === 0) ? 0 : -pos;
-    $('#sg-modal-container').css('bottom',pos);
-  },
+  // slide: function(pos) {
+  //   pos = (pos === 0) ? 0 : -pos;
+  //   $('#sg-modal-container').css('bottom',pos);
+  // },
   
   /**
   * slides the modal window to a particular annotation
@@ -622,12 +628,7 @@ var modalViewer = {
     
   },
   
-  /**
-  * alias for slide
-  */
-  show: function() {
-    modalViewer.slide(0);
-  },
+
   
   /**
   * ask the pattern for info so we can open the modal window and populate it
@@ -640,6 +641,8 @@ var modalViewer = {
       switchText = true;
       DataSaver.updateValue('modalActive', 'true');
       modalViewer.active = true;
+      
+      modalViewer.open();
     }
     
     // send a message to the pattern
@@ -809,6 +812,10 @@ var PrismLanguages = {
 // this shouldn't get hardcoded, also need to think about including Prism's real lang libraries (e.g. handlebars & twig)
 PrismLanguages.add({'twig': 'markup'});
 PrismLanguages.add({'mustache': 'markup'});
+// 
+// PrismLanguages.add({'scss': 'scss'});
+// PrismLanguages.add({'sass': 'sass'});
+// PrismLanguages.add({'css': 'css'});
 
 /*!
  * Default Panels for Pattern Lab plus Panel related events
@@ -851,11 +858,20 @@ var Panels = {
 
 // set-up the base file extensions to fetch
 var fileSuffixPattern = ((config.outputFileSuffixes !== undefined) && (config.outputFileSuffixes.rawTemplate !== undefined)) ? config.outputFileSuffixes.rawTemplate : '';
+
 var fileSuffixMarkup  = ((config.outputFileSuffixes !== undefined) && (config.outputFileSuffixes.markupOnly !== undefined)) ? config.outputFileSuffixes.markupOnly : '.markup-only';
+
+
 
 // add the default panels
 Panels.add({ 'id': 'sg-panel-pattern', 'default': true, 'templateID': 'pl-panel-template-code', 'httpRequest': true, 'httpRequestReplace': fileSuffixPattern, 'httpRequestCompleted': false, 'prismHighlight': true, 'keyCombo': 'ctrl+shift+u' });
+
 Panels.add({ 'id': 'sg-panel-html', 'name': 'HTML', 'default': false, 'templateID': 'pl-panel-template-code', 'httpRequest': true, 'httpRequestReplace': fileSuffixMarkup+'.html', 'httpRequestCompleted': false, 'prismHighlight': true, 'language': 'markup', 'keyCombo': 'ctrl+shift+y' });
+
+
+
+
+
 
 // gather panels from plugins
 Dispatcher.trigger('setupPanels');
@@ -906,6 +922,27 @@ var panelsViewer = {
   * @param  {Boolean}     if this is going to be passed back to the styleguide
   */
   gatherPanels: function(patternData, iframePassback, switchText) {
+    
+    
+    if (patternData.dependencies){
+      patternData.dependencies.forEach(function(dependency) {
+          
+          Panels.add({ 
+            'id': 'sg-panel-' + dependency.id, 
+            'name': dependency.name,
+            'default': false, 
+            'templateID': 'pl-panel-template-code', 
+            'httpRequest': true, 
+            'httpRequestReplace': dependency.src, 
+            'httpRequestCompleted': false,
+            'prismHighlight': true, 
+            'fileBase': dependency.fileBase,
+            'language': dependency.language
+            // 'keyCombo': 'ctrl+shift+c'
+          });
+      });
+    }
+    
 
     Dispatcher.addListener('checkPanels', panelsViewer.checkPanels);
 
@@ -914,11 +951,18 @@ var panelsViewer = {
 
     // get the base panels
     var panels = Panels.get();
+    
+    
+    console.log(panels);
+    
 
     // evaluate panels array and create content
     for (var i = 0; i < panels.length; ++i) {
 
-      panel = panels[i];
+      var panel = panels[i];
+      
+      
+      
       
       // catch pattern panel since it doesn't have a name defined by default
       if (panel.name === undefined) {
@@ -926,24 +970,66 @@ var panelsViewer = {
         panel.httpRequestReplace = panel.httpRequestReplace+'.'+patternData.patternExtension;
         panel.language = patternData.patternExtension;
       }
-
+      
       if ((panel.templateID !== undefined) && (panel.templateID)) {
 
         if ((panel.httpRequest !== undefined) && (panel.httpRequest)) {
 
           // need a file and then render
-          var fileBase = urlHandler.getFileName(patternData.patternPartial, false);
+          var fileBase = "";
+          
+          if (panel.fileBase){
+            fileBase = panel.fileBase;
+          } else {
+            fileBase = urlHandler.getFileName(patternData.patternPartial, false);
+          }
+          
+          
           var e        = new XMLHttpRequest();
           e.onload     = (function(i, panels, patternData, iframeRequest) {
             return function() {
-              prismedContent    = Prism.highlight(this.responseText, Prism.languages['html']);
+              
+              
+              var panel = panels[i];
+              
+              if (!panel.language){
+                panel.language = 'html';
+              }
+              
+              
+              
+              // Prism.plugins.NormalizeWhitespace.setDefaults({
+              // 	'remove-trailing': true,
+              // 	'remove-indent': true,
+              // 	'left-trim': true,
+              // 	'right-trim': true,
+              //   'remove-initial-line-feed': true,
+              //   'tabs-to-spaces': 2,
+              //   'indent': 2
+              // 	/*'break-lines': 80,
+              // 	
+              // 	
+              // 	
+              // 	'spaces-to-tabs': 4*/
+              // });
+              
+              // console.log(i);
+              // 
+              // console.log(panels);
+              
+              
+              
+              prismedContent    = Prism.highlight(this.responseText, Prism.languages[panel.language]);
               template          = document.getElementById(panels[i].templateID);
               templateCompiled  = Hogan.compile(template.innerHTML);
-              templateRendered  = templateCompiled.render({ 'language': 'html', 'code': prismedContent });
+              templateRendered  = templateCompiled.render({ 'language': panel.language, 'code': prismedContent });
               panels[i].content = templateRendered;
               Dispatcher.trigger('checkPanels', [panels, patternData, iframePassback, switchText]);
             };
           })(i, panels, patternData, iframePassback);
+          
+          
+          
           
           e.open('GET', fileBase+panel.httpRequestReplace+'?'+(new Date()).getTime(), true);
           e.send();
