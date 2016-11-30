@@ -130,7 +130,7 @@ gulp.task('default', ['build:bower', 'build:css-patternlab', 'build:html', 'buil
 		gulp.watch(['src/bower_components/**/*'], ['build:bower']);
 		gulp.watch(['src/css/prism-okaidia.css'],['build:css-general']);
 		gulp.watch(['src/sass/styleguide.scss'], ['build:css-patternlab']);
-		gulp.watch(['src/html/*'], ['build:html']);
+		gulp.watch(['src/html/**/*'], ['build:html']);
 		gulp.watch(['src/js/*'], ['build:js-pattern']);
 	}
 	
